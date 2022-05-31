@@ -13,7 +13,7 @@
 #define PORT 9527
 #define BACKLOG 10
 #define MAX_ACCEPT 1024
-#define MAX_EVENTS 512
+#define MAX_EVENTS 128
 
 #define ARRAY_SIZE(x)    (sizeof(x)/sizeof(x[0]))
 
@@ -25,6 +25,7 @@ using namespace std;
 
 #include <arpa/inet.h>
 #include <error.h>
+#include <fcntl.h>// non-blocking
 #include <netinet/in.h>// address
 #include <poll.h>
 #include <sys/epoll.h>
@@ -53,18 +54,12 @@ bool CTcpServer::init() {
 		return false;
 	}
 
+	printf("server listen socket=%d\n", _lsock);
+
 	do {
 
-		/*
-		应用协议 : SOL_SOCKET(套接字) IPPROTO_TCP IPPROTO_IP...
-		设置项 : SO_REUSEADDR(是否可以重用bind的地址)...
-		opt : 一些设置项指的是开关...
-		*/
-		int opt = 1;
-		ret = setsockopt(_lsock, SOL_SOCKET, SO_REUSEADDR, (void *)&opt, sizeof(opt));
-		if (0 > ret){
-			perror("setsockopt");
-			close(_lsock);
+		if (!set_address_reuse(_lsock)) {
+			perror("setsockopt set address reuse()");
 			break;
 		}
 
@@ -120,6 +115,7 @@ void CTcpServer::run(int type) {
 
 	int epfd;
 	struct epoll_event ev;
+	struct epoll_event events[MAX_EVENTS];// 存放事件的数组
 
 	switch (type) {
 		case TCP_SERVER_TYPE_SELECT: {
@@ -144,8 +140,12 @@ void CTcpServer::run(int type) {
 		case TCP_SERVER_TYPE_EPOLL: {
 			epfd = epoll_create(1);
 			ev.data.fd = _lsock;
-			ev.events = EPOLLIN;
+			ev.events = EPOLLIN | EPOLLET;
 			ret = epoll_ctl(epfd, EPOLL_CTL_ADD, _lsock, &ev);
+			if (0 > ret) {
+				printf("epoll_ctl add listen fd failed.\n");
+				return;
+			}
 			break;
 		}
 		default: {
@@ -290,13 +290,9 @@ void CTcpServer::run(int type) {
 				{
 					printf("accept new client[%d] but full, so refuse\n", client_fd);
 					close(client_fd);
-				}		
-
-			}
-			else	/* 来自已连接客户端的消息 */
-			{
-				for (int i=0; i<ARRAY_SIZE(fds); i++)
-				{
+				}
+			} else {/* 来自已连接客户端的消息 */
+				for (int i=0; i<ARRAY_SIZE(fds); i++) {
 					char buf[1024];
 					/* 判断fd是否有效，并且查看当前fd实际发生的事件是不是POLLIN */
 					if (fds[i].fd<0 || !(fds[i].revents & POLLIN))
@@ -338,13 +334,85 @@ void CTcpServer::run(int type) {
 			} /* cliet_fd message */
 			
 		} else if (TCP_SERVER_TYPE_EPOLL == type) {
-			struct epoll_event events[MAX_EVENTS];// 存放事件的数组
-			ret = epoll_wait(epfd, events, MAX_EVENTS, -1);
+			int n = epoll_wait(epfd, events, MAX_EVENTS, -1);// 返回发生事件的fd数量
+			if (0 > n) {
+				printf("epoll_wait failed.\n");
+				perror("epoll_wait()");
+				break;
+			} else if (0 == n) {
+				printf("epoll_wait timeout.\n");
+				continue;
+			} else {
+				for (int i=0; i<n; i++) {// 只遍历有事件发生的数组
+					if ((events[i].events & EPOLLERR) ||
+						(events[i].events & EPOLLHUP) ||
+						(!(events[i].events & EPOLLIN))) {
+
+						printf(stderr, "epoll error\n");
+						close(events[i].data.fd);
+
+					} else if (events[i].data.fd == _lsock) {
+
+						// 如果这里有事件发生，表示新的客户端连接上来
+						struct sockaddr_in client;
+						socklen_t len = sizeof(client);
+						int clientsock = accept(_lsock, (struct sockaddr *)&client, &len);
+						if (0 > clientsock) {
+							printf("accept() failed.\n");
+							continue;
+						}
+						// 设置非阻塞
+						// 把连接上来的客户端socket句柄加入epoll中
+						memset(&ev, 0, sizeof(struct epoll_event));
+						ev.data.fd = clientsock;
+						ev.events = EPOLLIN | EPOLLET;
+						ret = epoll_ctl(epfd, EPOLL_CTL_ADD, clientsock, &ev);
+
+						printf("client(socket=%d) connected ok.\n", clientsock);
+
+					} else {
+
+						char buffer[1024];
+						memset(buffer, 0, sizeof(buffer));
+						ssize_t readbytes = read(events[i].data.fd, buffer, sizeof(buffer));
+						if (0 >= readbytes) {
+							printf("client(eventfd=%d) had been disconnected.\n", events[i].data.fd);
+							memset(&ev, 0, sizeof(struct epoll_event));
+							ev.events = EPOLLIN;
+							ev.data.fd = events[i].data.fd;
+							ret = epoll_ctl(epfd, EPOLL_CTL_DEL, events[i].data.fd, &ev);
+							close(events[i].data.fd);
+							continue;
+						}
+						printf("recv(eventfd=%d,size=%ld):%s\n", events[i].data.fd, readbytes, buffer);
+
+					}
+				}
+				
+			}
 		} else {
 			_loop = false;
 			break;
 		}
 	} /* while(_loop) */
+}
+
+bool CTcpServer::set_address_reuse(int fd) {
+	/*
+	应用协议 : SOL_SOCKET(套接字) IPPROTO_TCP IPPROTO_IP...
+	设置项 : SO_REUSEADDR(是否可以重用bind的地址)...
+	opt : 一些设置项指的是开关...
+	*/
+	int opt = 1;
+	if (0 > setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (void *)&opt, sizeof(opt))){
+		return false;
+	}
+	return true;
+}
+
+void CTcpServer::set_non_blocking(int fd) {
+	int flags = fcntl(fd, F_GETFL, 0);
+	fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 }
 
 void CTcpServer::stop() {

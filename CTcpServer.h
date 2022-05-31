@@ -29,7 +29,8 @@ public:
 	void stop();
 
 private:
-
+	bool set_address_reuse(int fd);
+	void set_non_blocking(int fd);
 private:
 	int _lsock;// 监听socket
 
