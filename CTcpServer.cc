@@ -348,7 +348,7 @@ void CTcpServer::run(int type) {
 						(events[i].events & EPOLLHUP) ||
 						(!(events[i].events & EPOLLIN))) {
 
-						printf(stderr, "epoll error\n");
+						printf("epoll error\n");
 						close(events[i].data.fd);
 
 					} else if (events[i].data.fd == _lsock) {
