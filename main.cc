@@ -29,7 +29,7 @@ int main(int argc, const char** argv) {
 
 	EventLoop loop;
 	InetAddress addr("10.0.12.3", 9527);
-	P2pServer server(&loop, addr, "P2pServer");
+	P2pServer server(&loop, addr, "P2pServer", 30, 1);// 设置30s无数据通讯为空闲通道(关闭)
 
 	server.start(); // listenfd epoll_ctl=>epoll
 	loop.loop();    // epoll_wait以阻塞方式等待新用户连接，已连接用户的读写事件等
