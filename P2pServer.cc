@@ -10,6 +10,7 @@
  */
 
 #include "P2pServer.h"
+#include "p2p.pb.h"
 
 P2pServer::P2pServer(EventLoop* loop,
 	const InetAddress& listenAddr,
@@ -77,11 +78,54 @@ void P2pServer::onConnection(const TcpConnectionPtr& conn) {
 
 // 专门处理用户的读写事件
 // 注:接收到数据的时间信息(UTC) 需要自行+0800才是北京时间
-void P2pServer::onMessage(const TcpConnectionPtr& conn, Buffer* buffer, Timestamp time) {
-	string msg(buffer->retrieveAllAsString());
-	LOG_INFO << conn->name() << " echo " << msg.size()
-           << " bytes at " << time.toString();
-	conn->send(buffer);
+void P2pServer::onMessage(const TcpConnectionPtr& conn, Buffer* buf, Timestamp receiveTime) {
+	// string msg(buf->retrieveAllAsString());
+	// LOG_INFO << conn->name() << " echo " << msg.size()
+    //        << " bytes at " << receiveTime.toString();
+	// conn->send(buf);
+
+	while (buf->readableBytes() >= kHeaderLen) {// kHeaderLen == 8
+		// FIXME: use Buffer::peekInt32()
+		//const void* data = buf->peek();
+		//const int32_t* p = static_cast<const int32_t*>(data);
+		//int32_t be32 = *p;// SIGBUS
+		//const int32_t len = muduo::net::sockets::networkToHost32(be32);
+		//const int32_t cmd = muduo::net::sockets::networkToHost32(be32);
+
+		const int32_t len = buf->peekInt32();
+		LOG_INFO << "Received len:" << len;
+		buf->retrieveInt32();
+		const int32_t cmd = buf->peekInt32();
+		LOG_INFO << "Received cmd:" << cmd;
+		buf->retrieveInt32();
+
+		if (len > 65536 || len < 0) {
+			LOG_ERROR << "Invalid length " << len;
+			conn->shutdown();// FIXME: disable reading
+			break;
+		} else if (buf->readableBytes() >= len) {
+			//buf->retrieve(kHeaderLen);// 收缩8字节(指示payload的长度 + 命令字长度)
+			// 根据协议命令字判断协议包类型
+			if (PING == cmd) {
+				LOG_INFO << "收到PING";
+				muduo::string message(buf->peek(), len);
+				P2pPing ping;
+				if (!ping.ParseFromString(message)) {
+					LOG_WARN << "P2pPing parse error";
+				} else {
+					LOG_INFO << "age:" << ping.id();
+				}
+				//_messageCallback(conn, message, receiveTime);
+			} else if (REGISTER_REQ == cmd) {
+				LOG_INFO << "收到注册请求";
+			} else {
+
+			}
+			buf->retrieve(len);
+		} else {// 不足协议对象长度
+			break;
+		}
+	}
 
 	assert(!conn->getContext().empty());
 	WeakEntryPtr weakEntry(boost::any_cast<WeakEntryPtr>(conn->getContext()));
@@ -94,7 +138,7 @@ void P2pServer::onMessage(const TcpConnectionPtr& conn, Buffer* buffer, Timestam
 
 void P2pServer::onTimer() {
 	_connectionBuckets.push_back(Bucket());
-	dumpConnectionBuckets();
+	//dumpConnectionBuckets();
 }
 
 void P2pServer::dumpConnectionBuckets() const {

@@ -1,0 +1,30 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/mlz/tcpserver'
+/usr/bin/cmake -H/home/mlz/tcpserver -B/home/mlz/tcpserver --check-build-system CMakeFiles/Makefile.cmake 0
+/usr/bin/cmake -E cmake_progress_start /home/mlz/tcpserver/CMakeFiles /home/mlz/tcpserver/CMakeFiles/progress.marks
+make -f CMakeFiles/Makefile2 all
+make[1]: Entering directory '/home/mlz/tcpserver'
+make -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/depend
+make[2]: Entering directory '/home/mlz/tcpserver'
+cd /home/mlz/tcpserver && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /home/mlz/tcpserver /home/mlz/tcpserver /home/mlz/tcpserver /home/mlz/tcpserver /home/mlz/tcpserver/CMakeFiles/server.dir/DependInfo.cmake --color=
+make[2]: Leaving directory '/home/mlz/tcpserver'
+make -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/build
+make[2]: Entering directory '/home/mlz/tcpserver'
+/usr/bin/cmake -E cmake_echo_color --switch= --green --progress-dir=/home/mlz/tcpserver/CMakeFiles --progress-num=1 "Building CXX object CMakeFiles/server.dir/CTcpServer.cc.o"
+/usr/bin/c++   -I/home/mlz/tcpserver/./net -I/home/mlz/muduo  -O0 -Werror   -o CMakeFiles/server.dir/CTcpServer.cc.o -c /home/mlz/tcpserver/CTcpServer.cc
+/usr/bin/cmake -E cmake_echo_color --switch= --green --progress-dir=/home/mlz/tcpserver/CMakeFiles --progress-num=2 "Building CXX object CMakeFiles/server.dir/EchoServer.cc.o"
+/usr/bin/c++   -I/home/mlz/tcpserver/./net -I/home/mlz/muduo  -O0 -Werror   -o CMakeFiles/server.dir/EchoServer.cc.o -c /home/mlz/tcpserver/EchoServer.cc
+/usr/bin/cmake -E cmake_echo_color --switch= --green --progress-dir=/home/mlz/tcpserver/CMakeFiles --progress-num=3 "Building CXX object CMakeFiles/server.dir/P2pServer.cc.o"
+/usr/bin/c++   -I/home/mlz/tcpserver/./net -I/home/mlz/muduo  -O0 -Werror   -o CMakeFiles/server.dir/P2pServer.cc.o -c /home/mlz/tcpserver/P2pServer.cc
+/usr/bin/cmake -E cmake_echo_color --switch= --green --progress-dir=/home/mlz/tcpserver/CMakeFiles --progress-num=4 "Building CXX object CMakeFiles/server.dir/main.cc.o"
+/usr/bin/c++   -I/home/mlz/tcpserver/./net -I/home/mlz/muduo  -O0 -Werror   -o CMakeFiles/server.dir/main.cc.o -c /home/mlz/tcpserver/main.cc
+/usr/bin/cmake -E cmake_echo_color --switch= --green --progress-dir=/home/mlz/tcpserver/CMakeFiles --progress-num=5 "Building CXX object CMakeFiles/server.dir/p2p.pb.cc.o"
+/usr/bin/c++   -I/home/mlz/tcpserver/./net -I/home/mlz/muduo  -O0 -Werror   -o CMakeFiles/server.dir/p2p.pb.cc.o -c /home/mlz/tcpserver/p2p.pb.cc
+/usr/bin/cmake -E cmake_echo_color --switch= --green --bold --progress-dir=/home/mlz/tcpserver/CMakeFiles --progress-num=6 "Linking CXX executable server"
+/usr/bin/cmake -E cmake_link_script CMakeFiles/server.dir/link.txt --verbose=
+make[2]: Leaving directory '/home/mlz/tcpserver'
+/usr/bin/cmake -E cmake_echo_color --switch= --progress-dir=/home/mlz/tcpserver/CMakeFiles --progress-num=1,2,3,4,5,6 "Built target server"
+make[1]: Leaving directory '/home/mlz/tcpserver'
+/usr/bin/cmake -E cmake_progress_start /home/mlz/tcpserver/CMakeFiles 0
+make: Leaving directory '/home/mlz/tcpserver'
+ 

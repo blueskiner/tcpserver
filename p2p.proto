@@ -1,0 +1,45 @@
+syntax="proto3";
+
+import "google/protobuf/timestamp.proto";
+
+// [START messages]
+
+// p2p控制命令字类型
+enum P2pControlType {
+	UNKNOWN = 0;
+	
+	PING = 101;
+	PONG = 102;
+	
+	REGISTER_REQ = 1001;
+	REGISTER_RSP = 1002;
+}
+
+// 注: id =0 标识服务端 >0 标识设备端
+
+// ping
+message P2pPing {
+	int64 id = 1;
+	
+	google.protobuf.Timestamp ts = 2;// 双方交换的时间戳
+}
+// pong
+message P2pPong {
+	int64 id = 1;
+	
+	google.protobuf.Timestamp ts = 2;// 双方交换的时间戳
+}
+
+// register request
+message P2pRegisterReq {
+	int64 id = 1;
+}
+// register response
+message P2pRegisterRsp {
+	int64 id = 1;
+	
+	string host = 2;
+	int32 port = 3;
+}
+
+// [END messages]

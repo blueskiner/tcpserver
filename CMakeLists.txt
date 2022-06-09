@@ -33,6 +33,7 @@ target_link_libraries(
     ${PROJECT_NAME}
     muduo_net# 依赖muduo_base
     muduo_base# muduo基础库依赖pthread
+    protobuf# 协议序列化
     pthread# 越基础的库越要放在最后面
 ) # 链接库
  

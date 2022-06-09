@@ -28,6 +28,9 @@ using namespace muduo;
 using namespace muduo::net;
 using namespace placeholders;
 
+// typedef std::shared_ptr<muduo::Query> QueryPtr;
+// typedef std::shared_ptr<muduo::Answer> AnswerPtr;
+
 class P2pServer {
 public:
 	P2pServer(EventLoop* loop,
@@ -75,6 +78,8 @@ private:
 	WeakConnectionList _connectionBuckets;
 	int _numConnected; // should be atomic_int
 	const int _kMaxConnections;
+
+	const static size_t kHeaderLen = sizeof(int32_t) * 2;
 };
 
 #endif // !__JUNGLE_P2P_SERVER_H__
