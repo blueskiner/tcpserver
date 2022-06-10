@@ -39,6 +39,8 @@ public:
 		int idleSeconds,
 		int maxConnections);
 
+	~P2pServer();
+
 	void start();
     
 private:
@@ -80,6 +82,12 @@ private:
 	const int _kMaxConnections;
 
 	const static size_t kHeaderLen = sizeof(int32_t) * 2;
+
+private:
+	int _dsock;// 数据包套接字
+	bool createUdpSocket(const muduo::net::InetAddress& address);
+	
+	void processDataByCmd(const char* data, int32_t size, int32_t cmd);
 };
 
 #endif // !__JUNGLE_P2P_SERVER_H__

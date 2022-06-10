@@ -6,7 +6,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Thu Jun  9 19:44:17 2022
+# Make data base, printed on Thu Jun  9 21:44:04 2022
 
 # Variables
 
@@ -71,7 +71,7 @@ VSCODE_PIPE_LOGGING = true
 # environment
 PWD = /home/mlz/tcpserver
 # environment
-VSCODE_IPC_HOOK_CLI = /run/user/1001/vscode-ipc-277ca5dc-5017-4c76-a5d6-375b180959f2.sock
+VSCODE_IPC_HOOK_CLI = /run/user/1001/vscode-ipc-dadfb248-8460-43cd-a749-fb3e87a91a08.sock
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
 # environment
@@ -280,6 +280,7 @@ p2p.pb.cc.o:
 	$(MAKE) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/p2p.pb.cc.o
 
 .SUFFIXES: .hpux_make_needs_suffix_list
+ 
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
@@ -558,6 +559,7 @@ main.cc.o:
 #  File does not exist.
 #  File has not been updated.
 #  recipe to execute (from 'Makefile', line 213):
+ 
 	$(MAKE) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/main.cc.o
 
 P2pServer.o: P2pServer.cc.o
@@ -609,6 +611,6 @@ rebuild_cache:
 # strcache performance: lookups = 295 / hit rate = 73%
 # hash-table stats:
 # Load=77/8192=1%, Rehash=0, Collisions=6/295=2%
-# Finished Make data base on Thu Jun  9 19:44:17 2022
+# Finished Make data base on Thu Jun  9 21:44:04 2022
 
  

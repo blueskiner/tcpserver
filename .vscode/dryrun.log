@@ -5,6 +5,7 @@ make: Entering directory '/home/mlz/tcpserver'
 make -f CMakeFiles/Makefile2 all
 make[1]: Entering directory '/home/mlz/tcpserver'
 make -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/depend
+ 
 make[2]: Entering directory '/home/mlz/tcpserver'
 cd /home/mlz/tcpserver && /usr/bin/cmake -E cmake_depends "Unix Makefiles" /home/mlz/tcpserver /home/mlz/tcpserver /home/mlz/tcpserver /home/mlz/tcpserver /home/mlz/tcpserver/CMakeFiles/server.dir/DependInfo.cmake --color=
 make[2]: Leaving directory '/home/mlz/tcpserver'
@@ -23,6 +24,7 @@ make[2]: Entering directory '/home/mlz/tcpserver'
 /usr/bin/cmake -E cmake_echo_color --switch= --green --bold --progress-dir=/home/mlz/tcpserver/CMakeFiles --progress-num=6 "Linking CXX executable server"
 /usr/bin/cmake -E cmake_link_script CMakeFiles/server.dir/link.txt --verbose=
 make[2]: Leaving directory '/home/mlz/tcpserver'
+ 
 /usr/bin/cmake -E cmake_echo_color --switch= --progress-dir=/home/mlz/tcpserver/CMakeFiles --progress-num=1,2,3,4,5,6 "Built target server"
 make[1]: Leaving directory '/home/mlz/tcpserver'
 /usr/bin/cmake -E cmake_progress_start /home/mlz/tcpserver/CMakeFiles 0
